@@ -1,0 +1,28 @@
+apiVersion: ols.openshift.io/v1alpha1
+kind: OLSConfig
+metadata:
+  name: cluster
+spec:
+  llm:
+    providers:
+      - name: Azure
+        type: azure_openai
+        ##This is the base endpoint of your Azure OpenAI resource, and it's used by OpenShift Lightspeed to route LLM API requests to Azure.
+        url: https://<your-resource-name>.openai.azure.com/
+        deploymentName: gpt-4.1-nano
+        models:
+          - name: gpt-4.1-nano
+        credentialsSecretRef:
+          name: azure-api-keys
+  ols:
+    defaultProvider: Azure
+    defaultModel: gpt-4.1-nano
+    queryFilters:
+      - name: ip-address
+        pattern: '((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}'
+        replaceWith: <IP-ADDRESS>
+###Optional use only in case of rag
+    rag:
+      - image: 'quay.io/thoraxe/acme-byok:2504291405'
+        indexID: vector_db_index
+        indexPath: /rag/vector_db
